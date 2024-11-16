@@ -1,14 +1,8 @@
-# Use an official OpenJDK image as the base image
-FROM openjdk:17-jdk-slim
+FROM maven:3.8.5-openjdk-17 AS build
+COPY . .
+RUN mvn clean package -DskipTests
 
-# Set the working directory inside the container
-WORKDIR /app
-
-# Copy the jar file into the container
-COPY target/*.jar app.jar
-
-# Expose the port that your Spring Boot app is running on (default is 8080)
+FROM openjdk:17.0.1-jdk-slim
+COPY --from=build /target/mdbackend-0.0.1-SNAPSHOT.jar demo.jar
 EXPOSE 8080
-
-# Run the jar file
-ENTRYPOINT ["java", "-jar", "app.jar"]
+ENTRYPOINT ["java","-jar","demo.jar"]
